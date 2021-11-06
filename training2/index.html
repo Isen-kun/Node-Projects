@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Form</title>
+  </head>
+  <body>
+    <h1>Test Methods</h1>
+
+    <form action="/users" method="POST">
+      <input type="text" name="user" value="Rajorshi" />
+      <input type="text" name="id" value="100" />
+      <button type="submit">Submit</button>
+    </form>
+    <button class="btn">Delete</button>
+    <button class="btn1">Get JSON</button>
+    <button class="btn2">Get User</button>
+
+    <script>
+      const btn2 = document.querySelector(".btn2");
+      const btn1 = document.querySelector(".btn1");
+      const btn = document.querySelector(".btn");
+      const myID = document.querySelector('input[name="id"]');
+
+      btn2.addEventListener("click", () => {
+        fetch(`/users/${myID.value}`)
+          .then((res) => res.json())
+          .then((data) => {
+            console.log(data);
+            if (data.length != 0) {
+              data.forEach((element) => {
+                console.log(element);
+              });
+            } else {
+              console.log("not found");
+            }
+          });
+      });
+
+      btn1.addEventListener("click", () => {
+        fetch("/users")
+          .then((res) => res.json())
+          .then((data) => {
+            console.log(data);
+            data.users.forEach((element) => {
+              console.log(element);
+            });
+          });
+      });
+
+      btn.addEventListener("click", () => {
+        console.log("clicked");
+        const endPoint = "/users";
+        const id = myID.value;
+
+        fetch(endPoint + "/" + id, {
+          method: "delete",
+        })
+          .then((res) => res.json())
+          .then((data) => console.log(data));
+
+        fetch(endPoint + "/" + id, {
+          method: "put",
+        })
+          .then((res) => res.json())
+          .then((data) => console.log(data));
+      });
+    </script>
+  </body>
+</html>

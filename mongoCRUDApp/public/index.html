@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mongo App</title>
+  </head>
+
+  <style>
+    body {
+      text-align: center;
+      background-color: gainsboro;
+    }
+    .adder {
+      padding: 2%;
+      padding-bottom: 0%;
+    }
+    .searcher {
+      padding: 2%;
+    }
+    .btn2 {
+      padding: 0.5%;
+      margin-top: 1%;
+    }
+    .output {
+      padding: 2%;
+    }
+    .record {
+      padding: 0.5%;
+    }
+    .name {
+      margin-right: 1%;
+    }
+    .id {
+      margin-right: 1%;
+    }
+    .delButton {
+      margin-right: 1%;
+    }
+  </style>
+
+  <body>
+    <h1>MongoDB CRUD App</h1>
+    <div class="adder">
+      Add new user
+      <input type="text" name="user" value="Rajorshi" />
+      <button class="btn1">Add User</button>
+    </div>
+
+    <div class="searcher">
+      Search with name in Database (filter)
+      <input type="text" name="finder" value="Rajorshi" />
+      <button class="btn3">Find Match</button>
+    </div>
+
+    <button class="btn2">List Data</button>
+    <div class="output"></div>
+
+    <script>
+      const input1 = document.querySelector('input[name="user"]');
+      const btn1 = document.querySelector(".btn1");
+      const endPoint = "/users";
+      const btn2 = document.querySelector(".btn2");
+      const output = document.querySelector(".output");
+      const btn3 = document.querySelector(".btn3");
+      const input2 = document.querySelector('input[name="finder"]');
+
+      btn1.addEventListener("click", () => {
+        console.log("post");
+        const data = { name: input1.value };
+        console.log(data);
+        fetch(endPoint, {
+          method: "post",
+          body: JSON.stringify(data),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+          .then((res) => res.json())
+          .then((data) => console.log(data));
+      });
+
+      btn2.addEventListener("click", () => {
+        console.log("get");
+        fetch(endPoint)
+          .then((res) => res.json())
+          .then((data) => {
+            createOutput(data);
+          });
+      });
+
+      function createOutput(data) {
+        output.innerHTML = "<h4>Users records in Mongo Database</h4>";
+        data.forEach((element) => {
+          console.log(element);
+          const main = document.createElement("div");
+          main.className = "record";
+
+          main.append("Name: ");
+          const myInput = document.createElement("input");
+          myInput.className = "name";
+          myInput.setAttribute("type", "text");
+          myInput.value = element.name;
+          main.append(myInput);
+
+          main.append("ID: ");
+          const span1 = document.createElement("span");
+          span1.className = "id";
+          span1.textContent = element._id;
+          main.append(span1);
+
+          const button1 = document.createElement("button");
+          button1.className = "delButton";
+          button1.textContent = "Delete";
+          button1.style.color = "red";
+          button1.addEventListener("click", () => {
+            console.log("delete");
+            fetch(endPoint, {
+              method: "delete",
+              body: JSON.stringify(element),
+              headers: { "Content-Type": "application/json" },
+            })
+              .then((res) => res.json())
+              .then((data) => {
+                if (data.status) {
+                  main.remove();
+                } else {
+                  console.log("delete failed");
+                }
+              });
+          });
+          main.append(button1);
+
+          const button2 = document.createElement("button");
+          button2.textContent = "Update";
+          button2.style.color = "green";
+          button2.addEventListener("click", () => {
+            console.log("put");
+            element.name = myInput.value;
+            fetch(endPoint, {
+              method: "put",
+              body: JSON.stringify(element),
+              headers: { "Content-Type": "application/json" },
+            })
+              .then((res) => res.json())
+              .then((data) => {
+                console.log(data);
+              });
+          });
+          main.append(button2);
+
+          output.append(main);
+        });
+      }
+
+      btn3.addEventListener("click", () => {
+        fetch("/user/" + input2.value)
+          .then((res) => res.json())
+          .then((data) => {
+            console.log(data);
+            createOutput(data);
+          });
+      });
+    </script>
+  </body>
+</html>
